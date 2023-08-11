@@ -1,4 +1,4 @@
-import { Transaction } from 'ethers/lib.esm';
+import { Transaction } from 'ethers';
 
 /**
  * Serialize transaction to be sent to scroll oracles to calculate the gas. the nonce
