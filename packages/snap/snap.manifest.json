@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example Snap",
+  "description": "A Snap to provides transaction insights for ethereum Layer2 blockchains",
+  "proposedName": "L2 Insights",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "xlzdQ1CbKhcYS4jVpmC2G8RQSS92nEiTo4Uobj2Semw=",
+    "shasum": "2D6c9mcdLZL4l/Gge/SFaZNcPbmA6mlYqaFvZQTrK9I=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,11 +18,8 @@
     }
   },
   "initialPermissions": {
-    "snap_dialog": {},
-    "endowment:rpc": {
-      "dapps": true,
-      "snaps": false
-    }
+    "endowment:transaction-insight": {},
+    "endowment:ethereum-provider": {}
   },
   "manifestVersion": "0.1"
 }

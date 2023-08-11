@@ -29,7 +29,9 @@
   "dependencies": {
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
-    "buffer": "^6.0.3"
+    "@metamask/utils": "^7.1.0",
+    "buffer": "^6.0.3",
+    "ethers": "^6.7.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
