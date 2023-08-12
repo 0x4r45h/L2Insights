@@ -129,10 +129,10 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        <Span>L2 Insights</Span>
       </Heading>
       <Subtitle>
-        Get started by editing <code>src/index.ts</code>
+        This snap helps you to work with Ethereum Layer 2s more confidently.
       </Subtitle>
       <CardContainer>
         {state.error && (
@@ -156,7 +156,7 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the L2 Insights snap.',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
@@ -183,33 +183,6 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
-        <Card
-          content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
-            button: (
-              <SendHelloButton
-                onClick={handleSendHelloClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
       </CardContainer>
     </Container>
   );
