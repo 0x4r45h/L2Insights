@@ -1,7 +1,7 @@
 import type { OnTransactionHandler } from '@metamask/snaps-types';
 import { divider, panel, text } from '@metamask/snaps-ui';
 
-import {  formatEther } from 'ethers';
+import { formatEther } from 'ethers';
 import { getOracle } from './GasOracleFactory';
 
 /**

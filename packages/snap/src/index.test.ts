@@ -10,9 +10,7 @@ describe('onTransaction', () => {
       chainId: 'eip155:1',
     });
 
-    expect(response).toRender(
-      panel([text('No insights for this ChainID')]),
-    );
+    expect(response).toRender(panel([text('No insights for this ChainID')]));
 
     await close();
   });
