@@ -83,3 +83,4 @@ node_modules/
 /.idea/modules.xml
 /.idea/vcs.xml
 /.vscode/settings.json
+/temp/
