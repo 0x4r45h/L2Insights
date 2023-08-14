@@ -37,13 +37,20 @@ export const onTransaction: OnTransactionHandler = async ({
   const serialized = oracle.RLPEncode(transaction);
   const l1GasUsed = await oracle.getL1Gas(serialized);
   const l1Fee = await oracle.getL1Fee(serialized);
+  const l2Fee = await oracle.estimateL2Fee(transaction);
   return {
     content: panel([
-      text('**L1 Gas count:**'),
+      text('**L1 Gas:**'),
       text(l1GasUsed.toString()),
       divider(),
       text('**L1 Gas Fee:**'),
-      text(`${l1Fee.toString()} or in eth ${formatEther(l1Fee).toString()}`),
+      text(`${formatEther(l1Fee)} ETH`),
+      divider(),
+      text('**L2 Gas Fee:**'),
+      text(`${formatEther(l2Fee)} ETH`),
+      divider(),
+      text('**Total Fee:**'),
+      text(`${formatEther(l1Fee + l2Fee)} ETH`),
     ]),
   };
 };
