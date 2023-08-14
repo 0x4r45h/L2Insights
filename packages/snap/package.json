@@ -1,7 +1,6 @@
 {
   "name": "l2insights",
-  "version": "0.1.0",
-  "private": false,
+  "version": "0.1.1",
   "description": "A MetaMask Snap to provides transaction insights for ethereum Layer2 blockchains",
   "repository": {
     "type": "git",

@@ -1,18 +1,18 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A MetaMask Snap to provides transaction insights for ethereum Layer2 blockchains",
   "proposedName": "L2 Insights",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/0x4r45h/L2Insights.git"
   },
   "source": {
-    "shasum": "b2c10L6dBLcRW4I2GGdtJha237pIKBsc/z7lafqHG+E=",
+    "shasum": "pc9qeMjNAPUCUDdKyMnkErsSbABn82SrO3KnSg27UXs=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "snap",
+        "packageName": "l2insights",
         "registry": "https://registry.npmjs.org/"
       }
     }
