@@ -1,22 +1,8 @@
 import type { OnTransactionHandler } from '@metamask/snaps-types';
 import { divider, panel, text } from '@metamask/snaps-ui';
 
-import { ethers, formatEther } from 'ethers';
-import { serializeLegacyTx } from './utils';
-
-const scrollOracleAbi = [
-  'function overhead() external view returns (uint256)',
-  'function scalar() external view returns (uint256)',
-  'function l1BaseFee() external view returns (uint256)',
-  'function getL1Fee(bytes memory data) external view returns (uint256)',
-  'function getL1GasUsed(bytes memory data) external view returns (uint256)',
-];
-const ethersProvider = new ethers.BrowserProvider(ethereum);
-const scrollOracle = new ethers.Contract(
-  '0x5300000000000000000000000000000000000002',
-  scrollOracleAbi,
-  ethersProvider,
-);
+import { formatEther } from 'ethers';
+import { getOracle } from './GasOracleFactory';
 
 /**
  * Handle incoming transactions, sent through the `wallet_sendTransaction`
@@ -47,9 +33,10 @@ export const onTransaction: OnTransactionHandler = async ({
       content: panel([text('No insights for this ChainID')]),
     };
   }
-  const serialized = serializeLegacyTx(transaction);
-  const l1GasUsed = await getL1GasUsed(serialized);
-  const l1Fee = await getL1Fee(serialized);
+  const oracle = getOracle(chainId);
+  const serialized = oracle.RLPEncode(transaction);
+  const l1GasUsed = await oracle.getL1Gas(serialized);
+  const l1Fee = await oracle.getL1Fee(serialized);
   return {
     content: panel([
       text('**L1 Gas count:**'),
@@ -60,23 +47,3 @@ export const onTransaction: OnTransactionHandler = async ({
     ]),
   };
 };
-
-/**
- * Query the oracle for estimation around L1 Gas based on given transaction.
- *
- * @param tx - RLP encoded transaction payload.
- * @returns Estimated gas in wei.
- */
-async function getL1GasUsed(tx: string): Promise<bigint> {
-  return await scrollOracle.getL1GasUsed(tx);
-}
-
-/**
- * Query the oracle for estimation around L1 Fee based on given transaction.
- *
- * @param tx - RLP encoded transaction payload.
- * @returns Estimated fee in wei.
- */
-async function getL1Fee(tx: string): Promise<bigint> {
-  return await scrollOracle.getL1Fee(tx);
-}
