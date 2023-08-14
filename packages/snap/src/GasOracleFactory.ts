@@ -1,9 +1,11 @@
+import { TransactionRequest } from 'ethers/src.ts/providers/provider';
 import { ScrollAlphaOracle } from './ScrollOracle';
 
 export type GasOracle = {
   getL1Fee(tx: string): Promise<bigint>;
   getL1Gas(tx: string): Promise<bigint>;
-  RLPEncode(tx: { [key: string]: any }): string;
+  RLPEncode(tx: TransactionRequest): string;
+  estimateL2Fee(tx: TransactionRequest): Promise<bigint>;
 };
 
 /**

@@ -1,7 +1,11 @@
 ## What is this
+
 This MetaMask Snap shows detailed information about gas usage on the MetaMask UI when initiating a transaction on certain chains.
 
+You can install the latest version [Here](https://l2-insights-site.vercel.app/)
+
 #### Supported Chains
+
 - Scroll Alpha Testnet
 
 ## Getting Started

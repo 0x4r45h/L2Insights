@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A MetaMask Snap to provides transaction insights for ethereum Layer2 blockchains",
   "proposedName": "L2 Insights",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/0x4r45h/L2Insights.git"
   },
   "source": {
-    "shasum": "pc9qeMjNAPUCUDdKyMnkErsSbABn82SrO3KnSg27UXs=",
+    "shasum": "PKqPHe3SP28JXf8cONN0VkrcHh6jB01lRb+U7l3kJ04=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

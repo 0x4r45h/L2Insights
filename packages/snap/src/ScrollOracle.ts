@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { TransactionRequest } from 'ethers/src.ts/providers/provider';
 import { GasOracle } from './GasOracleFactory';
 import { serializeLegacyTx } from './utils';
 
@@ -27,7 +28,15 @@ export class ScrollAlphaOracle implements GasOracle {
     return await this.scrollOracle.getL1GasUsed(RLPEncodedTx);
   }
 
-  RLPEncode(tx: { [key: string]: any }): string {
+  RLPEncode(tx: TransactionRequest): string {
     return serializeLegacyTx(tx);
+  }
+
+  async estimateL2Fee(tx: TransactionRequest): Promise<bigint> {
+    const gasToUse = await this.ethersProvider.provider.estimateGas(tx);
+    if (!tx.gasPrice) {
+      throw new Error('There was an error estimating L2 fee');
+    }
+    return gasToUse * BigInt(tx.gasPrice);
   }
 }
