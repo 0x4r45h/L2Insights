@@ -43,22 +43,6 @@ export const Header = ({
   handleToggleClick(): void;
 }) => {
   const theme = useTheme();
-  const [state, dispatch] = useContext(MetaMaskContext);
-
-  const handleConnectClick = async () => {
-    try {
-      await connectSnap();
-      const installedSnap = await getSnap();
-
-      dispatch({
-        type: MetamaskActions.SetInstalled,
-        payload: installedSnap,
-      });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
   return (
     <HeaderWrapper>
       <LogoWrapper>
@@ -70,7 +54,6 @@ export const Header = ({
           onToggle={handleToggleClick}
           defaultChecked={getThemePreference()}
         />
-        <HeaderButtons state={state} onConnectClick={handleConnectClick} />
       </RightContainer>
     </HeaderWrapper>
   );

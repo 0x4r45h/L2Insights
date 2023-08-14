@@ -1,18 +1,6 @@
-# TypeScript Example Snap
+# L2 Insights
 
-This snap demonstrates how to develop a snap with TypeScript. It is a simple
-snap that displays a confirmation dialog when the `hello` JSON-RPC method is
-called.
+This MetaMask snap give more information about Gas fees when interacting with ethereum Layer2 blockchains
 
-## Testing
-
-The snap comes with some basic tests, to demonstrate how to write tests for
-snaps. To test the snap, run `yarn test` in this directory. This will use
-[`@metamask/snaps-jest`](https://github.com/MetaMask/snaps/tree/main/packages/snaps-jest)
-to run the tests in `src/index.test.ts`.
-
-## Notes
-
-- Babel is used for transpiling TypeScript to JavaScript, so when building with
-  the CLI, `transpilationMode` must be set to `localOnly` (default) or
-  `localAndDeps`.
+### Supported networks
+- Scroll Alpha Testnet
