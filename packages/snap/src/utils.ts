@@ -1,8 +1,8 @@
 import { Transaction } from 'ethers';
 
 /**
- * Serialize transaction to be sent to scroll oracles to calculate the gas. the nonce
- * is not valid because it doesn't make noticeable difference in calculations.
+ * Serialize transaction to be sent to L2 oracles to calculate the gas. the nonce
+ * is not valid because it doesn't make noticeable difference in the calculations.
  *
  * @param transaction - The transaction data from OnTransactionHandler.
  * @returns Unsigned RLP encoded transaction with constant nonce.

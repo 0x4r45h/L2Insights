@@ -6,6 +6,17 @@ export type GasOracle = {
   getL1Gas(tx: string): Promise<bigint>;
   RLPEncode(tx: TransactionRequest): string;
   estimateL2Fee(tx: TransactionRequest): Promise<bigint>;
+  estimateTotalFee(
+    tx: TransactionRequest,
+    l1fee: bigint,
+  ): Promise<TransactionFees>;
+};
+export type TransactionFees = {
+  L1fee: bigint;
+  L2fee: bigint;
+  TotalFee: bigint;
+  IsSuccessful: boolean;
+  MaxValue: bigint;
 };
 
 /**
