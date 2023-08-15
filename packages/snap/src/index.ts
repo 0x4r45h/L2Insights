@@ -38,32 +38,33 @@ export const onTransaction: OnTransactionHandler = async ({
   const l1GasUsed = await oracle.getL1Gas(serialized);
   const l1Fee = await oracle.getL1Fee(serialized);
   const totalFee = await oracle.estimateTotalFee(transaction, l1Fee);
-  let result: any[] = [
-    text('**L1 Gas:**'),
-    text(l1GasUsed.toString()),
-    divider(),
-    text('**L1 Gas Fee:**'),
-    text(`${formatEther(l1Fee)} ETH`),
-    divider(),
-    text('**L2 Gas Fee:**'),
-    text(`${formatEther(totalFee.L2fee)} ETH`),
-    divider(),
-    text('**Total Fee:**'),
-    text(`${formatEther(totalFee.TotalFee)} ETH`),
-  ];
-  let headingMsg = 'Estimations:';
+  let errors: any[] = [];
+  let header: any[] = [];
   if (!totalFee.IsSuccessful) {
-    headingMsg = 'TRANSACTION WILL FAIL!';
-    const errors = [
+    header = [heading('TRANSACTION WILL FAIL!'), divider()];
+    errors = [
       divider(),
       text(
         'The maximum ether can be sent is shown below. if you proceed with current value this transaction will fail!',
       ),
       copyable(`${formatEther(totalFee.MaxValue)}`),
     ];
-    result = [...result, ...errors];
   }
   return {
-    content: panel([heading(headingMsg), divider(), ...result]),
+    content: panel([
+      ...header,
+      text('**L1 Gas:**'),
+      text(l1GasUsed.toString()),
+      divider(),
+      text('**L1 Gas Fee:**'),
+      text(`${formatEther(l1Fee)} ETH`),
+      divider(),
+      text('**L2 Gas Fee:**'),
+      text(`${formatEther(totalFee.L2fee)} ETH`),
+      divider(),
+      text('**Total Fee:**'),
+      text(`${formatEther(totalFee.TotalFee)} ETH`),
+      ...errors,
+    ]),
   };
 };
