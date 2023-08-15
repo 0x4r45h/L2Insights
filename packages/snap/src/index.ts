@@ -1,5 +1,5 @@
 import type { OnTransactionHandler } from '@metamask/snaps-types';
-import { divider, panel, text } from '@metamask/snaps-ui';
+import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 
 import { formatEther } from 'ethers';
 import { getOracle } from './GasOracleFactory';
@@ -37,9 +37,22 @@ export const onTransaction: OnTransactionHandler = async ({
   const serialized = oracle.RLPEncode(transaction);
   const l1GasUsed = await oracle.getL1Gas(serialized);
   const l1Fee = await oracle.getL1Fee(serialized);
-  const l2Fee = await oracle.estimateL2Fee(transaction);
+  const totalFee = await oracle.estimateTotalFee(transaction, l1Fee);
+  let errors: any[] = [];
+  let header: any[] = [];
+  if (!totalFee.IsSuccessful) {
+    header = [heading('TRANSACTION WILL FAIL!'), divider()];
+    errors = [
+      divider(),
+      text(
+        'The maximum ether can be sent is shown below. if you proceed with current value this transaction will fail!',
+      ),
+      copyable(`${formatEther(totalFee.MaxValue)}`),
+    ];
+  }
   return {
     content: panel([
+      ...header,
       text('**L1 Gas:**'),
       text(l1GasUsed.toString()),
       divider(),
@@ -47,10 +60,11 @@ export const onTransaction: OnTransactionHandler = async ({
       text(`${formatEther(l1Fee)} ETH`),
       divider(),
       text('**L2 Gas Fee:**'),
-      text(`${formatEther(l2Fee)} ETH`),
+      text(`${formatEther(totalFee.L2fee)} ETH`),
       divider(),
       text('**Total Fee:**'),
-      text(`${formatEther(l1Fee + l2Fee)} ETH`),
+      text(`${formatEther(totalFee.TotalFee)} ETH`),
+      ...errors,
     ]),
   };
 };
