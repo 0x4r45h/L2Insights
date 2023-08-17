@@ -1,7 +1,7 @@
-import { ethers } from 'ethers';
+import { ethers, Transaction } from 'ethers';
 import { TransactionRequest } from 'ethers/src.ts/providers/provider';
+import { TransactionLike } from 'ethers/src.ts/transaction/transaction';
 import { GasOracle, TransactionFees } from './GasOracleFactory';
-import { serializeLegacyTx } from './utils';
 
 export class ScrollAlphaOracle implements GasOracle {
   private scrollOracleAbi = [
@@ -28,8 +28,12 @@ export class ScrollAlphaOracle implements GasOracle {
     return await this.scrollOracle.getL1GasUsed(RLPEncodedTx);
   }
 
-  RLPEncode(tx: TransactionRequest): string {
-    return serializeLegacyTx(tx);
+  RLPEncode(tx: TransactionLike): string {
+    const { from, ...rest } = tx;
+    const newTx = Transaction.from(rest);
+    // TODO : investigate why using type Eip2930 tx works better to estimate L1 gasFee on Scroll Alpha
+    newTx.type = 'berlin';
+    return newTx.unsignedSerialized;
   }
 
   async estimateL2Fee(tx: TransactionRequest): Promise<bigint> {

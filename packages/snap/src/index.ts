@@ -1,7 +1,8 @@
 import type { OnTransactionHandler } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
-
 import { formatEther } from 'ethers';
+import { hexToNumber } from '@metamask/utils';
+import { TransactionLike } from 'ethers/src.ts/transaction/transaction';
 import { getOracle } from './GasOracleFactory';
 
 /**
@@ -33,11 +34,17 @@ export const onTransaction: OnTransactionHandler = async ({
       content: panel([text('No insights for this ChainID')]),
     };
   }
+  const { gas, type, ...transactionLike } = transaction;
+  const tx: TransactionLike = {
+    ...transactionLike,
+    gasLimit: gas as string,
+    ...(type ? { type: hexToNumber(type as string) } : {}),
+  };
   const oracle = getOracle(chainId);
-  const serialized = oracle.RLPEncode(transaction);
+  const serialized = oracle.RLPEncode(tx);
   const l1GasUsed = await oracle.getL1Gas(serialized);
   const l1Fee = await oracle.getL1Fee(serialized);
-  const totalFee = await oracle.estimateTotalFee(transaction, l1Fee);
+  const totalFee = await oracle.estimateTotalFee(tx, l1Fee);
   let errors: any[] = [];
   let header: any[] = [];
   if (!totalFee.IsSuccessful) {
