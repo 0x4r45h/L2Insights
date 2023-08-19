@@ -2,12 +2,9 @@ import type { OnTransactionHandler } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { formatEther } from 'ethers';
 import { hexToNumber } from '@metamask/utils';
-import { TransactionLike } from 'ethers/src.ts/transaction/transaction';
 import { getOracle } from './GasOracleFactory';
+import { MetaMaskTransaction } from './utils';
 
-type MetaMaskTransaction = TransactionLike<string> & {
-  value: bigint;
-};
 /**
  * Handle incoming transactions, sent through the `wallet_sendTransaction`
  * method. This handler decodes the transaction data, and displays the type of
@@ -38,18 +35,23 @@ export const onTransaction: OnTransactionHandler = async ({
     };
   }
   console.log(JSON.stringify(transaction));
-  const { gas, type, value, ...transactionLike } = transaction;
+  const { gas, gasPrice, type, value, from, to, data, ...transactionLike } =
+    transaction;
   const tx: MetaMaskTransaction = {
     ...transactionLike,
-    gasLimit: gas as string,
-    value: value ? BigInt(value as string) : 0n,
+    from: from as string,
+    to: to as string,
+    value: value ? (value as string) : '0x0',
+    gasLimit: gas ? (gas as string) : '0x0',
+    gasPrice: gasPrice ? (gasPrice as string) : '0x0',
+    data: data ? (data as string) : '0x',
     ...(type ? { type: hexToNumber(type as string) } : {}),
   };
-  const oracle = getOracle(chainId);
-  const serialized = await oracle.RLPEncode(tx);
-  const l1GasUsed = await oracle.getL1Gas(serialized);
-  const l1Fee = await oracle.getL1Fee(serialized);
-  const totalFee = await oracle.estimateTotalFee(tx, l1Fee);
+  const oracle = getOracle(tx, chainId);
+  const l1GasUsed = await oracle.getL1Gas();
+  const l1Fee = await oracle.getL1Fee();
+
+  const totalFee = await oracle.estimateTotalFee(l1Fee);
   let errors: any[] = [];
   let header: any[] = [];
   if (!totalFee.IsSuccessful) {
@@ -66,7 +68,7 @@ export const onTransaction: OnTransactionHandler = async ({
       errors = [
         divider(),
         text(
-          'You require additional ethers, as indicated below or transaction will fail!',
+          'This transaction requires a minimum amount of Ether as indicated below, otherwise transaction will fail!',
         ),
         copyable(`${formatEther(totalFee.L1fee)}`),
       ];

@@ -1,5 +1,4 @@
 import { Wallet } from 'ethers';
-import { TransactionLike } from 'ethers/src.ts/transaction/transaction';
 import { BaseGasOracle } from './AbstractOracle';
 
 export class ScrollSepoliaOracle extends BaseGasOracle {
@@ -8,8 +7,8 @@ export class ScrollSepoliaOracle extends BaseGasOracle {
     this.ethersProvider,
   );
 
-  async RLPEncode(tx: TransactionLike): Promise<string> {
-    const tempTx = { ...tx };
+  async RLPEncode(): Promise<string> {
+    const tempTx = { ...this._tx };
     // as we don't have access to user's keys, we use a fake signer instead
     tempTx.from = this.unsafeSigner.address;
     // Sometimes metamask can't detect type and returns null as type value
