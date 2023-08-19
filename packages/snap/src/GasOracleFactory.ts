@@ -1,16 +1,7 @@
-import { TransactionRequest } from 'ethers/src.ts/providers/provider';
 import { ScrollAlphaOracle } from './ScrollAlphaOracle';
 import { ScrollSepoliaOracle } from './ScrollSepoliaOracle';
+import { BaseGasOracle } from './AbstractOracle';
 
-export type GasOracle = {
-  getL1Fee(tx: string): Promise<bigint>;
-  getL1Gas(tx: string): Promise<bigint>;
-  RLPEncode(tx: TransactionRequest): Promise<string>;
-  estimateTotalFee(
-    tx: TransactionRequest,
-    l1fee: bigint,
-  ): Promise<TransactionFees>;
-};
 export type TransactionFees = {
   L1fee: bigint;
   L2fee: bigint;
@@ -25,7 +16,7 @@ export type TransactionFees = {
  * @param chainId - The CAIP-2 chain ID of the network.
  * @returns A strategy implementing GasOracle interface.
  */
-export function getOracle(chainId: string): GasOracle {
+export function getOracle(chainId: string): BaseGasOracle {
   if (chainId === 'eip155:82751') {
     return new ScrollAlphaOracle();
   }
