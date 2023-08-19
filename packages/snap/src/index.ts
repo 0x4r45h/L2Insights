@@ -5,6 +5,9 @@ import { hexToNumber } from '@metamask/utils';
 import { TransactionLike } from 'ethers/src.ts/transaction/transaction';
 import { getOracle } from './GasOracleFactory';
 
+type MetaMaskTransaction = TransactionLike<string> & {
+  value: bigint;
+};
 /**
  * Handle incoming transactions, sent through the `wallet_sendTransaction`
  * method. This handler decodes the transaction data, and displays the type of
@@ -29,19 +32,21 @@ export const onTransaction: OnTransactionHandler = async ({
   transaction,
   chainId,
 }) => {
-  if (chainId !== 'eip155:82751') {
+  if (!['eip155:82751', 'eip155:8274f'].includes(chainId)) {
     return {
       content: panel([text('No insights for this ChainID')]),
     };
   }
-  const { gas, type, ...transactionLike } = transaction;
-  const tx: TransactionLike = {
+  console.log(JSON.stringify(transaction));
+  const { gas, type, value, ...transactionLike } = transaction;
+  const tx: MetaMaskTransaction = {
     ...transactionLike,
     gasLimit: gas as string,
+    value: value ? BigInt(value as string) : 0n,
     ...(type ? { type: hexToNumber(type as string) } : {}),
   };
   const oracle = getOracle(chainId);
-  const serialized = oracle.RLPEncode(tx);
+  const serialized = await oracle.RLPEncode(tx);
   const l1GasUsed = await oracle.getL1Gas(serialized);
   const l1Fee = await oracle.getL1Fee(serialized);
   const totalFee = await oracle.estimateTotalFee(tx, l1Fee);
@@ -49,13 +54,23 @@ export const onTransaction: OnTransactionHandler = async ({
   let header: any[] = [];
   if (!totalFee.IsSuccessful) {
     header = [heading('TRANSACTION WILL FAIL!'), divider()];
-    errors = [
-      divider(),
-      text(
-        'The maximum ether can be sent is shown below. if you proceed with current value this transaction will fail!',
-      ),
-      copyable(`${formatEther(totalFee.MaxValue)}`),
-    ];
+    if (totalFee.SendingMaxEth) {
+      errors = [
+        divider(),
+        text(
+          'The maximum ether can be sent is shown below. if you proceed with current value this transaction will fail!',
+        ),
+        copyable(`${formatEther((tx.value as bigint) - totalFee.L1fee)}`),
+      ];
+    } else {
+      errors = [
+        divider(),
+        text(
+          'You require additional ethers, as indicated below or transaction will fail!',
+        ),
+        copyable(`${formatEther(totalFee.L1fee)}`),
+      ];
+    }
   }
   return {
     content: panel([

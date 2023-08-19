@@ -1,11 +1,11 @@
 import { TransactionRequest } from 'ethers/src.ts/providers/provider';
-import { ScrollAlphaOracle } from './ScrollOracle';
+import { ScrollAlphaOracle } from './ScrollAlphaOracle';
+import { ScrollSepoliaOracle } from './ScrollSepoliaOracle';
 
 export type GasOracle = {
   getL1Fee(tx: string): Promise<bigint>;
   getL1Gas(tx: string): Promise<bigint>;
-  RLPEncode(tx: TransactionRequest): string;
-  estimateL2Fee(tx: TransactionRequest): Promise<bigint>;
+  RLPEncode(tx: TransactionRequest): Promise<string>;
   estimateTotalFee(
     tx: TransactionRequest,
     l1fee: bigint,
@@ -16,7 +16,7 @@ export type TransactionFees = {
   L2fee: bigint;
   TotalFee: bigint;
   IsSuccessful: boolean;
-  MaxValue: bigint;
+  SendingMaxEth: boolean;
 };
 
 /**
@@ -28,6 +28,10 @@ export type TransactionFees = {
 export function getOracle(chainId: string): GasOracle {
   if (chainId === 'eip155:82751') {
     return new ScrollAlphaOracle();
+  }
+
+  if (chainId === 'eip155:8274f') {
+    return new ScrollSepoliaOracle();
   }
   throw new Error('Oracle is not present for this chain id');
 }

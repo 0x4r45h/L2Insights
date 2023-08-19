@@ -21,14 +21,16 @@ export class ScrollAlphaOracle implements GasOracle {
   );
 
   async getL1Fee(RLPEncodedTx: string): Promise<bigint> {
-    return await this.scrollOracle.getL1Fee(RLPEncodedTx);
+    const l1Fee = await this.scrollOracle.getL1Fee(RLPEncodedTx);
+    // Because we use fake nonce, increase the fee by 5% to be safe
+    return (l1Fee * 105n) / 100n;
   }
 
   async getL1Gas(RLPEncodedTx: string): Promise<bigint> {
     return await this.scrollOracle.getL1GasUsed(RLPEncodedTx);
   }
 
-  RLPEncode(tx: TransactionLike): string {
+  async RLPEncode(tx: TransactionLike): Promise<string> {
     const { from, ...rest } = tx;
     const newTx = Transaction.from(rest);
     // TODO : investigate why using type Eip2930 tx works better to estimate L1 gasFee on Scroll Alpha
@@ -50,41 +52,51 @@ export class ScrollAlphaOracle implements GasOracle {
   }
 
   async estimateTotalFee(
-    tx: TransactionRequest,
+    transaction: TransactionRequest,
     l1fee: bigint,
   ): Promise<TransactionFees> {
-    if (!tx.gasPrice) {
-      throw new Error('Cannot estimate gas without proposed GasPrice');
-    }
+    // if (!tx.gasPrice) {
+    //   throw new Error('Cannot estimate gas without proposed GasPrice');
+    // }
     const finalFees: TransactionFees = {
+      SendingMaxEth: false,
       L1fee: l1fee,
       L2fee: 0n,
-      MaxValue: 0n,
       IsSuccessful: false,
       get TotalFee() {
-        return this.L1fee + this.L2fee;
+        console.log(`type of l1 fee`, typeof this.L1fee);
+        console.log(`type of l2 fee`, typeof this.L2fee);
+        return (this.L1fee as bigint) + (this.L2fee as bigint);
       },
     };
+    finalFees.L2fee =
+      BigInt(transaction.gasPrice as bigint) *
+      BigInt(transaction.gasLimit as bigint);
+    console.log('l1 fee is ', l1fee);
     try {
-      const gasToUse = await this.ethersProvider.provider.estimateGas(tx);
-      finalFees.L2fee = gasToUse * BigInt(tx.gasPrice);
+      await this.ethersProvider.provider.estimateGas(transaction);
       finalFees.IsSuccessful = true;
       return finalFees;
     } catch (e) {
-      if (!tx.value) {
-        console.log(e);
-        throw new Error('Cannot estimate transaction fees');
-      }
-      // Here we try to subtract L1 fee from total value to estimate the gas
-      const expectedTx = tx;
-      expectedTx.value = BigInt(tx.value) - l1fee;
-      // Estimate gas again with modified value
-      const gasToUse = await this.ethersProvider.provider.estimateGas(
-        expectedTx,
-      );
-      finalFees.L2fee = gasToUse * BigInt(tx.gasPrice);
       finalFees.IsSuccessful = false;
-      finalFees.MaxValue = expectedTx.value;
+      console.log(e);
+      // TODO : make sure error is related to gas calculation, otherwise throw error as it is
+      if (
+        (transaction.value && (transaction.value as bigint) === 0n) ||
+        (transaction.data && transaction.data !== '0x0')
+      ) {
+        // so user is executing arbitrary codes
+        return finalFees;
+      }
+      finalFees.SendingMaxEth = true;
+      // Here we try to subtract L1 fee from total value to estimate the gas
+      const expectedTx = { ...transaction };
+      expectedTx.value = (expectedTx.value as bigint) - l1fee;
+      console.log('final value', expectedTx.value);
+      // Estimate gas again with modified value
+      console.log('expected tx : ', expectedTx);
+      // console.log(JSON.stringify(expectedTx));
+      await this.ethersProvider.provider.estimateGas(expectedTx);
       return finalFees;
     }
   }
