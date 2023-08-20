@@ -9,7 +9,8 @@ export type TransactionFees = {
   L2fee: bigint;
   TotalFee: bigint;
   IsSuccessful: boolean;
-  SendingMaxEth: boolean;
+  SendingMaxValue: boolean;
+  Shortfall: bigint;
 };
 
 /**

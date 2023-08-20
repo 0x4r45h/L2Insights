@@ -1,12 +1,7 @@
 import type { OnTransactionHandler } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { formatEther } from 'ethers';
-import {
-  CaipChainId,
-  hexToNumber,
-  isCaipChainId,
-  parseCaipChainId,
-} from '@metamask/utils';
+import { hexToNumber, isCaipChainId, parseCaipChainId } from '@metamask/utils';
 import { getOracle } from './GasOracleFactory';
 import { isChainIdSupported, L2ChainID, MetaMaskTransaction } from './utils';
 
@@ -56,13 +51,21 @@ export const onTransaction: OnTransactionHandler = async ({
   }
   const chainReference = hexToNumber(chainReferenceHex) as L2ChainID;
 
-  const { gas, type, value, from, to, data, ...transactionLike } = transaction;
+  const { gas, gasLimit, type, value, from, to, data, ...transactionLike } =
+    transaction;
   const tx: MetaMaskTransaction = {
     ...transactionLike,
     from: from as string,
     to: to as string,
     value: value ? (value as string) : '0x0',
-    gasLimit: gas ? (gas as string) : '0x0',
+    gasLimit: (() => {
+      if (gasLimit) {
+        return gasLimit as string;
+      } else if (gas) {
+        return gas as string;
+      }
+      return '0x0';
+    })(),
     data: data ? (data as string) : '0x',
     chainId: chainReference,
     ...(type ? { type: hexToNumber(type as string) } : {}),
@@ -76,21 +79,22 @@ export const onTransaction: OnTransactionHandler = async ({
   let header: any[] = [];
   if (!totalFee.IsSuccessful) {
     header = [heading('TRANSACTION WILL FAIL!'), divider()];
-    if (totalFee.SendingMaxEth) {
+    if (totalFee.SendingMaxValue) {
+      const maxEth = BigInt(tx.value) - totalFee.L1fee;
       errors = [
         divider(),
         text(
           'The maximum ether can be sent is shown below. if you proceed with current value this transaction will fail!',
         ),
-        copyable(`${formatEther(BigInt(tx.value) - totalFee.L1fee)}`),
+        copyable(`${formatEther(maxEth > 0n ? maxEth : 0n)}`),
       ];
     } else {
       errors = [
         divider(),
         text(
-          'This transaction requires a minimum amount of Ether as indicated below, otherwise transaction will fail!',
+          'This transaction requires more ETH to complete, the estimated amount is shown below:',
         ),
-        copyable(`${formatEther(totalFee.L1fee)}`),
+        copyable(`${formatEther(totalFee.Shortfall)}`),
       ];
     }
   }
