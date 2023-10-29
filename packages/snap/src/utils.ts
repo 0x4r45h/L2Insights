@@ -11,6 +11,7 @@ export type MetaMaskTransaction = TransactionLike<string> & {
 };
 
 export enum L2ChainID {
+  SCROLL = 534352,
   SCROLL_ALPHA = 534353,
   SCROLL_SEPOLIA = 534351,
   OPTIMISM = 10,

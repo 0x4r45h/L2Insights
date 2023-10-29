@@ -17,6 +17,7 @@ This MetaMask Snap (extension) provides a clear preview of the fees you'll face 
 - Optimism Goerli
 - Base
 - Base Goerli
+- Scroll Mainnet
 - Scroll Sepolia Testnet
 - Scroll Alpha Testnet
 

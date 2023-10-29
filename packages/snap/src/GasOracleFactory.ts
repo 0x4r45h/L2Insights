@@ -3,6 +3,7 @@ import { ScrollSepoliaOracle } from './ScrollSepoliaOracle';
 import { BaseGasOracle } from './AbstractOracle';
 import { L2ChainID, MetaMaskTransaction } from './utils';
 import { OptimismChainsOracle } from './OptimismChainsOracle';
+import { ScrollOracle } from './ScrollOracle';
 
 export type TransactionFees = {
   L1fee: bigint;
@@ -30,6 +31,10 @@ export function getOracle(
 
   if (chainId === L2ChainID.SCROLL_SEPOLIA) {
     return new ScrollSepoliaOracle(tx);
+  }
+
+  if (chainId === L2ChainID.SCROLL) {
+    return new ScrollOracle(tx);
   }
 
   if (

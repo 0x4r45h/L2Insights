@@ -12,7 +12,7 @@
     "url": "git+https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "license": "(MIT-0 OR Apache-2.0)",
-  "author": "",
+  "author": "Arash <0x4r45h@gmail.com>",
   "workspaces": [
     "packages/*"
   ],
