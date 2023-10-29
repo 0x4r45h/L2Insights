@@ -140,17 +140,6 @@ const Index = () => {
             <b>An error happened:</b> {state.error.message}
           </ErrorMessage>
         )}
-        {!state.isFlask && (
-          <Card
-            content={{
-              title: 'Install',
-              description:
-                'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
-              button: <InstallFlaskButton />,
-            }}
-            fullWidth
-          />
-        )}
         {!state.installedSnap && (
           <Card
             content={{
@@ -160,11 +149,9 @@ const Index = () => {
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
-                  disabled={!state.isFlask}
                 />
               ),
             }}
-            disabled={!state.isFlask}
           />
         )}
         {shouldDisplayReconnectButton(state.installedSnap) && (
